@@ -40,10 +40,14 @@
         });
         
           
-         res.status(200).json({ msg:userCreated });
+         res.status(201).json({
+             msg:"registration successful" ,
+             token:await userCreated.generateToken(),
+             userId:userCreated._id.toString(),
+            });
           
     }
-    catch (error) {
+    catch (error) { 
         res.status(500).json({message:"internal server error",error:error.message});
   }
  };
