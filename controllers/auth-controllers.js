@@ -53,32 +53,44 @@
   }
  };
 
+ //Login controller
+
 const login=async(req,res)=>{
     
     try {
         // console.log("incoming body", req.body)
         const { email, password } = req.body;
+
         if (!email || !password) {
             return res.status(400).json({ message: "Email and password are required." });
         }
+
         const userExist = await User.findOne({ email });
+        
         if (!userExist) {
             return res.status(400).json({ message: "User with this email does not exist." });
         }
-        const isMatch = await bcrypt.compare(password, userExist.password);
-        if (isMatch) {
+       
+        // const user = await bcrypt.compare(password, userExist.password);
+        const user=await userExist.comparePassword(password);
+        
+
+        if (user) {
             res.status(200).json({
                 msg: "Login Successful",
                 token: await userExist.generateToken(),
                 userId: userExist._id.toString(),
             });
-        } else {
+        } 
+        else {
             res.status(401).json({
                 msg: "Invalid email or password."
             });
         }
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error", error: error.message });
+    } 
+    catch (error) {
+        // res.status(500).json({ message: "Internal server error", error: error.message });
+        next(error);
     }
 }
 
